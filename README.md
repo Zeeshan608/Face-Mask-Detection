@@ -8,7 +8,7 @@ Upload a photo or use your camera. The app finds every face and tells you whethe
 
 <br>
 
-[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-0E9F8E?style=for-the-badge&logo=streamlit&logoColor=white)](https://YOUR-APP-NAME.streamlit.app)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-Open_App-0E9F8E?style=for-the-badge&logo=streamlit&logoColor=white)](https://face-mask-detection-muvcrwqe4ny3jdwmgt2pz3.streamlit.app/)
 
 ![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)
 ![TensorFlow](https://img.shields.io/badge/TensorFlow-FF6F00?style=flat-square&logo=tensorflow&logoColor=white)
@@ -140,7 +140,7 @@ face-mask-detection/
 
 ```bash
 # 1. Clone the repository
-git clone https://github.com/YOUR-USERNAME/face-mask-detection.git
+git clone https://github.com/Zeeshan608/face-mask-detection.git
 cd face-mask-detection
 
 # 2. Create and activate a virtual environment
