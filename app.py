@@ -52,13 +52,30 @@ html("<style>" + CSS + "</style>")
 # ---------- Model and face detector (loaded once, then cached) ----------
 @st.cache_resource(show_spinner="Loading model...")
 def load_assets():
-    return (tf.keras.models.load_model(MODEL_PATH),
-            cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml"))
+    model = tf.keras.models.load_model(MODEL_PATH)
+    classifier = getattr(cv2, "CascadeClassifier", None)
+    data = getattr(cv2, "data", None)
+    haarcascades = getattr(data, "haarcascades", None)
+    if not callable(classifier):
+        return model, None, "OpenCV face detection is unavailable. Reinstall opencv-python-headless and reboot the app."
+    if not haarcascades:
+        return model, None, "OpenCV's Haar cascade files are unavailable. Reinstall opencv-python-headless and reboot the app."
+
+    cascade_path = os.path.join(haarcascades, "haarcascade_frontalface_default.xml")
+    if not os.path.isfile(cascade_path):
+        return model, None, "The OpenCV face-detection file is missing. Reinstall opencv-python-headless and reboot the app."
+
+    cascade = classifier(cascade_path)
+    if cascade.empty():
+        return model, None, "OpenCV could not load its face detector. Reinstall opencv-python-headless and reboot the app."
+    return model, cascade, None
 
 if not os.path.exists(MODEL_PATH):
     st.error("Model file not found. Place face_mask_model.keras in the same folder as app.py.")
     st.stop()
-model, cascade = load_assets()
+model, cascade, detector_warning = load_assets()
+if detector_warning:
+    st.warning(detector_warning + " The app will classify the whole image instead.")
 
 # ---------- Image helpers ----------
 def read_image(file):
@@ -68,7 +85,7 @@ def read_image(file):
 
 def analyse(rgb, find_faces, threshold):
     boxes = []
-    if find_faces:
+    if find_faces and cascade is not None:
         found = cascade.detectMultiScale(cv2.cvtColor(rgb, cv2.COLOR_RGB2GRAY), 1.1, 5, minSize=(60, 60))
         boxes = sorted(tuple(int(v) for v in b) for b in found)  # left to right
     whole = not boxes
@@ -127,7 +144,7 @@ with right:
         html(f'<div class="summary">{n} face{"s" if n != 1 else ""} checked: {m} with a mask, {n - m} without.</div>'
              f'<div class="split"><i class="a" style="width:{100*m/n:.1f}%"></i><i class="b" style="width:{100*(n-m)/n:.1f}%"></i></div>')
         st.image(annotate(rgb, results))
-        if whole and find_faces:
+        if whole and find_faces and cascade is not None:
             st.warning("No face was found, so the whole photo was checked. Try a clearer, front-facing photo.")
         html("".join(card(i, n, r) for i, r in enumerate(results, 1)))
 

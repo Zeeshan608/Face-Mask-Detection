@@ -16,3 +16,5 @@ The app loads `face_mask_model.keras` from the same directory as `app.py`. Resul
 ## Deploy on Streamlit Community Cloud
 
 Deploy `app.py` from the repository root and select Python 3.12 in the app's advanced settings. The pinned dependencies in `requirements.txt` include the CPU-only TensorFlow build.
+
+If OpenCV face detection is unavailable, the app displays a warning and checks the whole image instead of crashing. After changing dependencies, reboot the app from Streamlit Community Cloud so it installs the updated requirements.
